@@ -6,6 +6,7 @@ from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
 app.config.from_object('config.default.DefaultConfig')
+app.config.from_pyfile('oauth_config.py', silent=True)
 
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
