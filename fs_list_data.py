@@ -1,4 +1,3 @@
-import datetime
 import functools
 import json
 import os.path
@@ -6,64 +5,9 @@ import os.path
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
-import requests
 
 
-class FoursquareSession:
-    BASE_URL = 'https://api.foursquare.com/v2'
-    API_VERSION_DATE = datetime.date(2017, 5, 9).strftime('%Y%m%d')
-
-    def __init__(self, oauth_token):
-        self.session = requests.Session()
-        self.oauth_token = oauth_token
-
-        self.session.params.update({
-            'oauth_token': self.oauth_token,
-            'v': self.API_VERSION_DATE
-        })
-
-    def _get_endpoint(self, endpoint, params=None):
-        if params is None:
-            params = {}
-        response = self.session.get(endpoint, params=params)
-        response.raise_for_status()
-
-        return response.json()
-
-    def _post_endpoint(self, endpoint, params=None):
-        if params is None:
-            params = {}
-        response = self.session.post(endpoint, params=params)
-        response.raise_for_status()
-
-        return response.json()
-
-    def user_lists(self, user_id):
-        endpoint = '{base_url}/users/{user_id}/lists'.format(
-            base_url=self.BASE_URL, user_id=user_id)
-        params = {
-            'group': 'created'
-        }
-
-        return self._get_endpoint(endpoint, params)
-
-    def fs_list(self, list_id, limit=200, offset=0):
-        endpoint = '{base_url}/lists/{list_id}/'.format(
-            base_url=self.BASE_URL, list_id=list_id)
-        params = {
-            'limit': limit,
-            'offset': offset
-        }
-
-        return self._get_endpoint(endpoint, params)
-
-    def delete_from_list(self, list_id, venue_id):
-        endpoint = '{base_url}/lists/{list_id}/deleteitem'.format(
-            base_url=self.BASE_URL, list_id=list_id)
-        params = {
-            'venueId': venue_id
-        }
-        return self._post_endpoint(endpoint, params)
+import fs_api
 
 
 def cache_as_json(json_fname):
@@ -196,7 +140,7 @@ def write_to_json(data, fname):
 def main():
     token_json = read_from_json('oauth_token.json')
     fs_config = read_from_json('fs_list_data_config.json')
-    fs_session = FoursquareSession(token_json['access_token'])
+    fs_session = fs_api.FoursquareSession(token_json['access_token'])
     user_lists_response = retrieve_user_lists(fs_session, fs_config['user_id'])
     user_lists_df = DataFrame(
         user_lists_response['response']['lists']['items'])
