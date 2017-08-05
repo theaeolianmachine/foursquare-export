@@ -89,7 +89,7 @@ def clean_venues(list_items_df):
     # Remove duplicate venues
     venues_df.drop_duplicates('id', inplace=True)
     # Set index as the venue ID
-    venues_df.set_index('id', inplace=True)
+    venues_df.set_index('id', drop=False, inplace=True)
 
     # Remove closed venues
     venues_df.closed = venues_df.closed.fillna(False).astype(np.bool)
