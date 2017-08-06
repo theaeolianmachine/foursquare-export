@@ -1,5 +1,4 @@
 import functools
-import json
 import os.path
 
 import numpy as np
@@ -8,6 +7,7 @@ from pandas import DataFrame
 
 
 import fs_api
+from common import read_from_json, write_to_json
 
 
 def cache_as_json(json_fname):
@@ -125,16 +125,6 @@ def clean_venues(list_items_df):
     venues_df.price = venues_df.price.fillna('?')
 
     return venues_df
-
-
-def read_from_json(fname):
-    with open(fname) as fobj:
-        return json.load(fobj)
-
-
-def write_to_json(data, fname):
-    with open(fname, 'w') as fobj:
-        json.dump(data, fobj, indent=2, sort_keys=True)
 
 
 def main():

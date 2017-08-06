@@ -15,10 +15,17 @@ class FoursquareSession:
             'v': self.API_VERSION_DATE
         })
 
+    def _check_rate_limits(self, response):
+        calls_remaining = int(response.headers['X-RateLimit-Remaining'])
+        if calls_remaining < 10:
+            print("Warning: {} calls remaining to Foursquare API.".format(
+                calls_remaining))
+
     def _get_endpoint(self, endpoint, params=None):
         if params is None:
             params = {}
         response = self.session.get(endpoint, params=params)
+        self._check_rate_limits(response)
         response.raise_for_status()
 
         return response.json()
@@ -27,6 +34,7 @@ class FoursquareSession:
         if params is None:
             params = {}
         response = self.session.post(endpoint, params=params)
+        self._check_rate_limits(response)
         response.raise_for_status()
 
         return response.json()
@@ -49,6 +57,14 @@ class FoursquareSession:
         }
 
         return self._get_endpoint(endpoint, params)
+
+    def add_to_list(self, list_id, venue_id):
+        endpoint = '{base_url}/lists/{list_id}/additem'.format(
+            base_url=self.BASE_URL, list_id=list_id)
+        params = {
+            'venueId': venue_id
+        }
+        return self._post_endpoint(endpoint, params)
 
     def delete_from_list(self, list_id, venue_id):
         endpoint = '{base_url}/lists/{list_id}/deleteitem'.format(
